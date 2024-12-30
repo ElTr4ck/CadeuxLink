@@ -102,6 +102,9 @@ class CreateExchangeActivity : AppCompatActivity() {
                 it.collection("participants").document(currentUser.uid).set(participantData)
                     .addOnSuccessListener {
                         Log.d("CreateExchange", "Usuario agregado a la lista de participantes")
+                        Toast.makeText(this, "Intercambio creado exitosamente", Toast.LENGTH_SHORT)
+                            .show()
+                        finish()
                     }
                     .addOnFailureListener { e ->
                         Log.e(
@@ -109,19 +112,12 @@ class CreateExchangeActivity : AppCompatActivity() {
                             "Error al agregar usuario a la lista de participantes",
                             e
                         )
-
-                        Toast.makeText(
-                            this,
-                            "Intercambio creado con éxito. Código: $invitationCode",
-                            Toast.LENGTH_LONG
-                        ).show()
-                        finish() // Cierra la actividad
                     }
-                    .addOnFailureListener { e ->
-                        Log.e("CreateExchange", "Error al guardar el intercambio", e)
-                        Toast.makeText(this, "Error al crear el intercambio", Toast.LENGTH_SHORT)
-                            .show()
-                    }
+            }
+            .addOnFailureListener { e ->
+                Log.e("CreateExchange", "Error al guardar el intercambio", e)
+                Toast.makeText(this, "Error al crear el intercambio", Toast.LENGTH_SHORT)
+                    .show()
             }
     }
 }
