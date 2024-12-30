@@ -55,66 +55,71 @@ class JoinExchangeActivity : AppCompatActivity() {
             .addOnSuccessListener { documents ->
                 if (documents.isEmpty) {
                     Toast.makeText(this, "Código de invitación no válido", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
                 }
-                // Verificar si el usuario ya está en el intercambio
-                else if (documents.any { document ->
-                    document.reference.collection("participants")
-                        .document(currentUser.uid)
-                        .get()
-                        .isSuccessful
-                        }) {
-                    Toast.makeText(this, "Ya estás en este intercambio", Toast.LENGTH_SHORT).show()
-                }
+
+                // Validar cada documento (aunque debería ser único por código)
+                val document = documents.first() // Considerar solo el primer documento encontrado
+                val exchangeId = document.id
+
                 // Verificar si la fecha límite de registro ha pasado
-                else if (documents.any { document ->
-                        val deadlineString = document.getString("deadline")
-                        if (deadlineString != null) {
-                            try {
-                                val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-                                val deadlineDate = sdf.parse(deadlineString)
-                                val currentDate = Calendar.getInstance().time
-                                !(deadlineDate != null && deadlineDate.before(currentDate))// Comparar fechas
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                false // Si hay un error al procesar la fecha, ignorar
-                            }
-                        } else {
-                            false // Si el campo está ausente, no considerar este documento
+                val deadlineString = document.getString("deadline")
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val currentDate = Calendar.getInstance().time
+
+                if (deadlineString != null) {
+                    try {
+                        val deadlineDate = sdf.parse(deadlineString)
+                        if (deadlineDate != null && currentDate.after(deadlineDate)) {
+                            Toast.makeText(this, "El intercambio ya no acepta nuevos participantes", Toast.LENGTH_SHORT).show()
+                            return@addOnSuccessListener
                         }
-                    }) {
-                    Toast.makeText(this, "El intercambio ya no acepta nuevos participantes", Toast.LENGTH_SHORT).show()
-                }
-
-                else {
-                    for (document in documents) {
-                        val exchangeId = document.id
-
-                        // Agregar al usuario a la subcolección de participantes
-                        val participantData = mapOf(
-                            "name" to (currentUser.displayName ?: "Usuario Anónimo"),
-                            "email" to (currentUser.email ?: "Desconocido"),
-                            "status" to "Confirmado"
-                        )
-
-                        db.collection("exchanges")
-                            .document(exchangeId)
-                            .collection("participants")
-                            .document(currentUser.uid)
-                            .set(participantData)
-                            .addOnSuccessListener {
-                                Toast.makeText(this, "Te has unido al intercambio exitosamente", Toast.LENGTH_SHORT).show()
-                                finish() // Cierra la actividad
-                            }
-                            .addOnFailureListener { e ->
-                                Toast.makeText(this, "Error al unirte al intercambio", Toast.LENGTH_SHORT).show()
-                                e.printStackTrace()
-                            }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Toast.makeText(this, "Error al procesar la fecha límite", Toast.LENGTH_SHORT).show()
+                        return@addOnSuccessListener
                     }
                 }
+
+                // Verificar si el usuario ya está en el intercambio
+                document.reference.collection("participants")
+                    .document(currentUser.uid)
+                    .get()
+                    .addOnSuccessListener { participantDoc ->
+                        if (participantDoc.exists()) {
+                            Toast.makeText(this, "Ya estás en este intercambio", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Agregar al usuario a la subcolección de participantes
+                            val participantData = mapOf(
+                                "name" to (currentUser.displayName ?: "Usuario Anónimo"),
+                                "email" to (currentUser.email ?: "Desconocido"),
+                                "status" to "Confirmado"
+                            )
+
+                            db.collection("exchanges")
+                                .document(exchangeId)
+                                .collection("participants")
+                                .document(currentUser.uid)
+                                .set(participantData)
+                                .addOnSuccessListener {
+                                    Toast.makeText(this, "Te has unido al intercambio exitosamente", Toast.LENGTH_SHORT).show()
+                                    finish() // Cierra la actividad
+                                }
+                                .addOnFailureListener { e ->
+                                    Toast.makeText(this, "Error al unirte al intercambio", Toast.LENGTH_SHORT).show()
+                                    e.printStackTrace()
+                                }
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Toast.makeText(this, "Error al verificar participación", Toast.LENGTH_SHORT).show()
+                        e.printStackTrace()
+                    }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(this, "Error al buscar el intercambio", Toast.LENGTH_SHORT).show()
                 e.printStackTrace()
             }
+
     }
 }
