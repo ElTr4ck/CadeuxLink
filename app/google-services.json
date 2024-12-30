@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "310613981946",
+    "project_id": "cadeaux-link-app",
+    "storage_bucket": "cadeaux-link-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:310613981946:android:6229ec138da36231eda743",
+        "android_client_info": {
+          "package_name": "com.example.cadeauxlink"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGjD_n2zq1waDGpu7sU7Ze2m6EyGYYlhc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

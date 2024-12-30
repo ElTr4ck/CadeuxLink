@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.CadeauxLink" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Estilos de AppCompat -->
+        <item name="actionBarStyle">@style/Widget.AppCompat.ActionBar</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+
+        <!-- Colores para Material Components -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorSecondary">@color/secondary</item>
+    </style>
+
+
+
+</resources>
