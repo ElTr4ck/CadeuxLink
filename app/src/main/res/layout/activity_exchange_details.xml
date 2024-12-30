@@ -128,7 +128,7 @@
             android:id="@+id/btnAddParticipant"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginStart="170dp"
+            android:layout_marginStart="18dp"
             android:layout_marginBottom="8dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/add_participant_description"

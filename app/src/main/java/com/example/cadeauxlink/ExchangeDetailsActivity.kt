@@ -1,6 +1,7 @@
 package com.example.cadeauxlink
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
@@ -180,24 +181,39 @@ class ExchangeDetailsActivity : AppCompatActivity() {
             .whereEqualTo("invitationCode", invitationCode)
             .get()
             .addOnSuccessListener { documents ->
-                if (documents.any { document ->
-                        val deadlineString = document.getString("deadline")
-                        if (deadlineString != null) {
-                            try {
-                                val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-                                val deadlineDate = sdf.parse(deadlineString)
-                                val currentDate = Calendar.getInstance().time
-                                deadlineDate != null && deadlineDate.before(currentDate) // Comparar fechas
-                            } catch (e: Exception) {
-                                e.printStackTrace()
-                                false // Si hay un error al procesar la fecha, ignorar
-                            }
-                        } else {
-                            false // Si el campo está ausente, no considerar este documento
-                        }
-                    }) {
-                    Toast.makeText(this, "El intercambio ya no acepta nuevos participantes", Toast.LENGTH_SHORT).show()
+                if (documents.isEmpty) {
+                    Toast.makeText(this, "Código de invitación no válido", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
                 }
+
+                // Validar cada documento (aunque debería ser único por código)
+                val document = documents.first() // Considerar solo el primer documento encontrado
+
+                // Verificar si la fecha límite de registro ha pasado
+                val deadlineString = document.getString("deadline")
+                val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                val currentDate = Calendar.getInstance().time
+
+                if (deadlineString != null) {
+                    try {
+                        val deadlineDate = sdf.parse(deadlineString)
+                        if (deadlineDate != null && currentDate.after(deadlineDate)) {
+                            Toast.makeText(this, "El intercambio ya no acepta nuevos participantes", Toast.LENGTH_SHORT).show()
+                            return@addOnSuccessListener
+                        }
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Toast.makeText(this, "Error al procesar la fecha límite", Toast.LENGTH_SHORT).show()
+                        return@addOnSuccessListener
+                    }
+                }
+
+                // Si todo se cumplio proceder a mostrar el AddParticipantActivity
+                val intent = Intent(this, AddParticipantActivity::class.java)
+                intent.putExtra("exchangeId", invitationCode)
+                intent.putExtra("exchangeDate", deadlineString)
+
+                startActivity(intent)
             }
 
     }

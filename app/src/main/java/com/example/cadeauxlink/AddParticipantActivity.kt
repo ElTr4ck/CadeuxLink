@@ -68,17 +68,55 @@ class AddParticipantActivity : AppCompatActivity() {
         val participant = hashMapOf(
             "name" to name,
             "email" to email,
-            "phone" to phone
+            "status" to "Pendiente",
+            "phone" to phone,
         )
 
-        db.collection("participants")
-            .add(participant)
-            .addOnSuccessListener { _ ->
-                sendInvitation(email)
-                clearInputs()
-            }
-            .addOnFailureListener { _ ->
-                Toast.makeText(this, R.string.error_adding_participant, Toast.LENGTH_SHORT).show()
+        // Obtén el código de invitación del intent
+        val invitationCode = intent.getStringExtra("exchangeId")
+        if (invitationCode == null) {
+            Log.e("ExchangeDetails", "No se recibió un código de invitación.")
+            finish() // Cierra la actividad si no hay código
+        }
+
+        db.collection("exchanges")
+            .whereEqualTo("invitationCode", invitationCode)
+            .get()
+            .addOnSuccessListener { documents ->
+                if (documents.isEmpty) {
+                    Toast.makeText(this, "Codigo de invitación invalido", Toast.LENGTH_SHORT).show()
+                    return@addOnSuccessListener
+                }
+
+                // Validar cada documento (aunque debería ser único por código)
+                val document = documents.first() // Considerar solo el primer documento encontrado
+
+                // Verificar si el correo electrónico ya está en la lista de participantes
+                val participantsCollection = document.reference.collection("participants")
+                participantsCollection.whereEqualTo("email", email)
+                    .get()
+                    .addOnSuccessListener { querySnapshot ->
+                        if (!querySnapshot.isEmpty) {
+                            Toast.makeText(
+                                this,
+                                "El correo electrónico ya está en la lista de participantes",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        else {
+                            // Ingresar el participante a la subcolección de participantes
+                            document.reference.collection("participants")
+                                .add(participant)
+                                .addOnSuccessListener {
+                                    sendInvitation(email)
+                                    Toast.makeText(this, "Participante agregado exitosamente", Toast.LENGTH_SHORT).show()
+                                    clearInputs()
+                                }
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("AddParticipantActivity", "Error al verificar participantes", e)
+                    }
             }
     }
 
@@ -107,16 +145,13 @@ class AddParticipantActivity : AppCompatActivity() {
         emailIntent.putExtra(Intent.EXTRA_SUBJECT, "HAS SIDO INVITADO A UN INTERCAMBIO - CADEUXLINK")
 
         emailIntent.putExtra(Intent.EXTRA_TEXT, """Hola!
-            Has sido invitado a un intercambio.
-            Te invita el usuario: ${auth.currentUser?.email}
-            El codigo de invitacion de este intercambio es: $invitationCode
-            Favor de confirmar tu asistencia antes de la fecha: $exchangeDate
-            
-            Saludos cordiales,
-            ${auth.currentUser?.email}
-            
-            Si no tienes la app CadeuxLink puedes descargarla en el siguiente enlace: PROXIMAMENTE
-        """.trimMargin()) //TODO: PONER ENLACE DE DESCARGA DE LA APP
+Has sido invitado a un intercambio.
+Te invita el usuario: ${auth.currentUser?.email}
+El codigo de invitacion de este intercambio es: $invitationCode
+Favor de confirmar tu asistencia antes de la fecha: $exchangeDate
+Saludos cordiales,
+${auth.currentUser?.email}
+Si no tienes la app CadeuxLink puedes descargarla en el siguiente enlace: PROXIMAMENTE""".trimMargin()) //TODO: PONER ENLACE DE DESCARGA DE LA APP
 
         try {
             startActivity(Intent.createChooser(emailIntent, "Enviar correo electrónico"))
