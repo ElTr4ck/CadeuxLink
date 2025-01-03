@@ -93,6 +93,12 @@
     <string name="invalid_email">Por favor, ingresa un correo electrónico válido</string>
     <string name="invalid_phone">Por favor, ingresa un número de teléfono válido</string>
     <string name="error_sending_email">No se ha podido enviar el correo.</string>
+    <string name="edit_participant_title">Editar Participante</string>
+    <string name="edit_participant_button">Editar e Invitar</string>
+
+    <!-- Nuevos strings para la vista de editar intercambio -->
+    <string name="edit_exchange_title">Editar Intercambio</string>
+    <string name="edit_exchange_button">Editar Intercambio</string>
 
 
 </resources>
