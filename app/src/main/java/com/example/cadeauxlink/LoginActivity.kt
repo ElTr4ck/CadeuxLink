@@ -9,6 +9,7 @@ import androidx.core.view.get
 import com.example.cadeauxlink.databinding.ActivityLoginBinding
 import com.google.firebase.auth.FirebaseAuth
 
+
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding

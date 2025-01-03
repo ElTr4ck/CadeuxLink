@@ -15,6 +15,12 @@
     <string name="my_exchanges">Mis intercambios</string>
     <string name="join_exchange">Unirse a un intercambio</string>
     <string name="profile">Perfil</string>
+    <string name="buscar">Buscar</string>
+    <string name="upcoming_exchanges">Próximos Intercambios</string>
+    <string name="recent_notifications">Notificaciones Recientes</string>
+    <string name="home">Inicio</string>
+    <string name="exchanges">Intercambios</string>
+    <string name="create">Crear Intercambio</string>
 
     <!-- Nuevos strings para la vista de crear intercambio -->
     <string name="create_exchange_title">Crear Nuevo Intercambio</string>
