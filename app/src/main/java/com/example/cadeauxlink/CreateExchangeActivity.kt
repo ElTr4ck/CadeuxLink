@@ -10,7 +10,9 @@ import com.example.cadeauxlink.databinding.ActivityCreateExchangeBinding
 import com.google.android.material.chip.Chip
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 import java.util.UUID
 
 class CreateExchangeActivity : AppCompatActivity() {
@@ -74,6 +76,34 @@ class CreateExchangeActivity : AppCompatActivity() {
 
         if (exchangeName.isEmpty() || maxAmount.isEmpty() || deadline.isEmpty() || exchangeDate.isEmpty() || location.isEmpty()) {
             Toast.makeText(this, "Por favor completa todos los campos", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Validar que la fecha del intercambio sea mayor a la fecha actual y mayor a la fecha límite de registro
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        try {
+            val deadlineDate = sdf.parse(deadline)
+            val exchangeDateParsed = sdf.parse(exchangeDate)
+            val currentDate = Calendar.getInstance().time
+
+            if (deadlineDate == null || exchangeDateParsed == null) {
+                Toast.makeText(this, "Formato de fecha inválido", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            if (currentDate.after(exchangeDateParsed)) {
+                Toast.makeText(this, "La fecha del intercambio debe ser posterior a la fecha actual", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+            if (deadlineDate.after(exchangeDateParsed)) {
+                Toast.makeText(this, "La fecha del intercambio debe ser posterior a la fecha límite de registro", Toast.LENGTH_SHORT).show()
+                return
+            }
+
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error al procesar las fechas", Toast.LENGTH_SHORT).show()
+            e.printStackTrace()
             return
         }
 
