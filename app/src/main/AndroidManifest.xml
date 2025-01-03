@@ -59,6 +59,21 @@
             android:exported="true"
             android:theme="@style/Theme.CadeauxLink"/>
 
+        <activity
+            android:name=".ParticipantsActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CadeauxLink"/>
+
+        <activity
+            android:name=".EditParticipantActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CadeauxLink"/>
+
+        <activity
+            android:name=".EditExchangeActivity"
+            android:exported="true"
+            android:theme="@style/Theme.CadeauxLink"/>
+
     </application>
 
 </manifest>
