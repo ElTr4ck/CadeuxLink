@@ -46,7 +46,12 @@ class ExchangeDetailsActivity : AppCompatActivity() {
             finish() // Cierra la actividad si no hay código
         }
 
-        //TODO: Agregar funcionalidad para editar intercambio
+        // Lógica para editar intercambio
+        binding.btnEditExchange.setOnClickListener {
+            val intent = Intent(this, EditExchangeActivity::class.java)
+            intent.putExtra("exchangeId", invitationCode)
+            startActivity(intent)
+        }
 
         // Lógica para crear el sorteo
         binding.btnCreateRaffle.setOnClickListener {
@@ -74,6 +79,13 @@ class ExchangeDetailsActivity : AppCompatActivity() {
                 Log.e("ExchangeDetails", "No se recibió un código de invitación.")
                 finish() // Cierra la actividad si no hay código
             }
+        }
+
+        //Logica para editar participantes
+        binding.btnEditParticipant.setOnClickListener {
+            val intent = Intent(this, ParticipantsActivity::class.java)
+            intent.putExtra("exchangeId", invitationCode)
+            startActivity(intent)
         }
     }
 
@@ -208,7 +220,7 @@ class ExchangeDetailsActivity : AppCompatActivity() {
                     }
                 }
 
-                // Si todo se cumplio proceder a mostrar el AddParticipantActivity
+                // Si  se cumplio proceder a mostrar el AddParticipantActivity
                 val intent = Intent(this, AddParticipantActivity::class.java)
                 intent.putExtra("exchangeId", invitationCode)
                 intent.putExtra("exchangeDate", deadlineString)
